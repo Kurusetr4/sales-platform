@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="MUSE - Mandiri Unified Sales Ecosystem">
+  <title>MUSE | Mandiri Unified Sales Ecosystem</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23003d79'/%3E%3Ctext x='50' y='65' font-size='50' font-weight='bold' text-anchor='middle' fill='white'%3EM%3C/text%3E%3C/svg%3E">
+  
+  <!-- CSS -->
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/pages.css">
+  
+  <!-- Preload hint -->
+  <style>
+    /* Critical CSS - prevent FOUC */
+    #app {
+      min-height: 100vh;
+    }
+    
+    /* Initial loading state */
+    .app-loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #001a33 0%, #003d79 50%, #0066cc 100%);
+    }
+    
+    .app-loading-content {
+      text-align: center;
+      color: white;
+    }
+    
+    .app-loading-logo {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 20px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+      font-weight: bold;
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+    
+    .app-loading-text {
+      font-size: 14px;
+      opacity: 0.8;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.7; transform: scale(0.98); }
+    }
+  </style>
+</head>
+<body>
+  <!-- App Container -->
+  <div id="app">
+    <!-- Initial Loading State -->
+    <div class="app-loading">
+      <div class="app-loading-content">
+        <div class="app-loading-logo">M</div>
+        <div class="app-loading-text">Loading MUSE...</div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Toast Container -->
+  <div id="toast-container" class="toast-container"></div>
+  
+  <!-- JavaScript - Load in order -->
+  <script src="js/config.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/pages/login.js"></script>
+  <script src="js/pages/dashboard.js"></script>
+  <script src="js/pages/pipeline.js"></script>
+  <script src="js/pages/leaderboard.js"></script>
+  <script src="js/pages/pages.js"></script>
+  
+  <!-- Initialize App -->
+  <script>
+    // DEMO MODE: Uncomment line below to always start fresh (show login)
+    localStorage.removeItem('muse_user');
+    
+    function initMUSE() {
+      console.log('=== MUSE INIT ===');
+      
+      // Check dependencies
+      const required = ['MUSE_CONFIG', 'MUSE_DATA', 'Router', 'Auth', 'UI', 'Components'];
+      const missing = required.filter(name => !window[name]);
+      
+      if (missing.length > 0) {
+        console.error('MUSE: Missing:', missing);
+        document.getElementById('app').innerHTML = `
+          <div class="app-loading">
+            <div class="app-loading-content">
+              <div class="app-loading-logo" style="background: #ef4444;">!</div>
+              <div class="app-loading-text">Error: Missing ${missing.join(', ')}</div>
+            </div>
+          </div>
+        `;
+        return;
+      }
+      
+      console.log('MUSE: Routes:', Object.keys(Router.routes));
+      
+      // Initialize Router
+      Router.init();
+      
+      console.log('MUSE: Ready, path:', Router.getCurrentPath(), 'logged:', AppState.isLoggedIn);
+    }
+    
+    // Global logout function
+    window.forceLogout = function() {
+      localStorage.removeItem('muse_user');
+      window.location.hash = '';
+      window.location.reload();
+    };
+    
+    // Run when DOM ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initMUSE);
+    } else {
+      initMUSE();
+    }
+  </script>
+</body>
+</html>
